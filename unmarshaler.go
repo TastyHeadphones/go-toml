@@ -1753,6 +1753,12 @@ func (d *decoder) assignInteger(v reflect.Value, value *unstable.Node) (reflect.
 	// literals (0x/0o/0b) work. Fall back to parseFloat for decimals that do
 	// not fit in int64 (parseFloat can still approximate those).
 	if k := v.Kind(); k == reflect.Float32 || k == reflect.Float64 {
+		// TextUnmarshaler takes precedence over native assignment.
+		if mayImplementTextUnmarshaler(v.Type()) {
+			if ok, err := tryTextUnmarshaler(v, value.Data); ok {
+				return v, err
+			}
+		}
 		if i, err := parseInteger(value.Data); err == nil {
 			f := float64(i)
 			if v.OverflowFloat(f) {

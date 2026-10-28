@@ -6063,6 +6063,12 @@ func TestIssue1109_TextUnmarshalerNamedScalarKinds(t *testing.T) {
 		assert.Equal(t, textScalarFloat1109(20), x.V)
 	})
 
+	t.Run("hex integer into float kind", func(t *testing.T) {
+		// UnmarshalText gets the raw literal, and its error is returned.
+		var x struct{ V textScalarFloat1109 }
+		assert.Error(t, toml.Unmarshal([]byte(`V = 0x10`), &x))
+	})
+
 	t.Run("bool", func(t *testing.T) {
 		var x struct{ V textScalarBool1109 }
 		assert.NoError(t, toml.Unmarshal([]byte(`V = true`), &x))
